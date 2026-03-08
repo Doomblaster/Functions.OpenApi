@@ -99,3 +99,11 @@
 
 **Decision:** 6 comments are actionable bugs (Amos), 3 are config hygiene (Espen decision), 1 is test cleanup (Bobbie), 3 are duplicates of the dictionary/schema-ID issues across 3.0/3.1 builders.
 
+### PR #1 Review Closure (2026-03-08T18:05Z)
+- **Task:** Resolve all remaining PR review conversations
+- **Status:** ✅ **All 13 threads resolved**
+- **All actionable fixes applied by Amos** (see Amos history for details)
+- **PR #1 ready for merge** — no unresolved conversations remain
+- **Verification:** Build ✅ 65/65 tests pass, no regressions
+- **Orchestration log:** `.squad/orchestration-log/2026-03-08T18-05-naomi.md`
+

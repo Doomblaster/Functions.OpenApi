@@ -70,6 +70,16 @@
 - **Windows git mv workaround:** folder rename required temp name trick (same as restructuring) due to file locks from obj/bin
 - All 56 tests pass, build succeeds with 0 errors
 
+### PR Review Fixes (2026-03-08)
+- Fixed 7 issues from PR review, all on branch `squad/repo-restructure-and-multi-version-openapi`
+- **Hardcoded URL:** Changed `url: '/api/openapi.json'` to `url: 'openapi.json'` (relative URL) in `OpenApiUIEndpoint.cs` — works with any route prefix or reverse proxy
+- **Config cleanup:** `.squad/config.json` teamRoot changed from absolute to `"."`, `.copilot/config.json` split into shared (tracked) + `.copilot/config.local.json` (gitignored), `.copilot/mcp-config.json` removed (unused Azure DevOps config)
+- **ILogger using:** `TestFunctions.cs` fixed from `Microsoft.Testing.Platform.Logging` to `Microsoft.Extensions.Logging`
+- **Duplicate responses:** `OpenApiDocumentBuilder.Responses.cs` changed `Add()` to `TryAdd()` with content merging for duplicate status codes
+- **GetFriendlyFullName:** `OpenApiSchemaBuilderBase.cs` replaced `TrimEnd('`','1','2','3','4')` with `IndexOf('`')` substring — handles any number of generic type parameters
+- **Pattern learned:** Use relative URLs for sibling endpoints; split config files into shared vs local early; `TrimEnd` with char arrays is fragile for stripping suffixed numbers
+- Build: ✅ 0 errors, Tests: ✅ 65/65 pass
+
 ### Branch & PR Created (2026-03-08)
 - Branch: `squad/repo-restructure-and-multi-version-openapi`
 - PR: #1 at https://github.com/Doomblaster/Functions.OpenApi/pull/1 — "feat: Repository restructuring and multi-version OpenAPI support"
@@ -88,4 +98,18 @@
 - Build: ✅ 0 errors, Tests: ✅ 56/56 pass, no regressions
 - **Key pattern learned:** Always use `ToLowerInvariant()` for programmatic string comparisons; always check interface implementations when detecting generic types like `IDictionary<,>`
 - **Orchestration log:** See `.squad/orchestration-log/2026-03-08T15-35-amos.md`
+
+### PR Review Comment Resolution (2026-03-08)
+- **Task:** Resolve 13 automated review comments from copilot-pull-request-reviewer on PR #1
+- **Fixes applied (2026-03-08T18-05Z):**
+  1. **Hardcoded URL:** Changed `url: '/api/openapi.json'` to `url: 'openapi.json'` (relative) in `OpenApiUIEndpoint.cs`
+  2. **Config cleanup:** `.squad/config.json` teamRoot → `"."`, `.copilot/config.json` split into shared + `.copilot/config.local.json` (gitignored), removed `.copilot/mcp-config.json`
+  3. **ILogger import:** `TestFunctions.cs` fixed from `Microsoft.Testing.Platform.Logging` to `Microsoft.Extensions.Logging`
+  4. **Duplicate responses:** `OpenApiDocumentBuilder.Responses.cs` `Add()` → `TryAdd()` with content merging
+  5. **GetFriendlyFullName:** `OpenApiSchemaBuilderBase.cs` replaced `TrimEnd('`','1','2','3','4')` with `IndexOf('`')` substring
+  6. **Dictionary detection:** Added `IsDictionaryType()` and `GetDictionaryInterface()` helpers to base class, applied to both 3.0 and 3.1 builders
+  7. **Schema ID mismatch:** Changed primitive IDs from shorthand to `GetFriendlyFullName()` format (`"System.Double"`, `"System.Byte"`, `"System.Boolean"`, `"System.DateTime"`)
+- **Build:** ✅ 0 errors, Tests: ✅ 65/65 pass
+- **All comments resolved**, PR ready for merge
+- **Orchestration log:** `.squad/orchestration-log/2026-03-08T18-05-amos.md`
 
