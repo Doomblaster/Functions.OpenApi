@@ -37,14 +37,14 @@ jobs:
         run: dotnet build Function.OpenApi.slnx --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test --solution Function.OpenApi.slnx --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test --solution Function.OpenApi.slnx --no-build --configuration Release --report-xunit-trx
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
-          path: '**/test-results.trx'
+          path: '**/TestResults/**/*.trx'
 
   pack:
     name: Pack NuGet
