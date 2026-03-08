@@ -228,3 +228,32 @@
 
 **Verification:** Build ✅, 81/81 tests pass ✅, pushed to branch.
 
+### CI Pipeline & NuGet Packaging Setup (2026-03-09)
+
+**Context:** Espen requested CI pipeline for build/test on PRs and NuGet packaging on push to main.
+
+**Decisions made:**
+1. **Versioning tool: MinVer 6.0.0** — Tag-driven semver, zero config, integrates as MSBuild package. No external tool installs needed. Tags like `v1.0.0` drive version; pre-release versions auto-generated from commit height.
+2. **CI workflow: `.github/workflows/ci.yml`** — Two jobs: `build-and-test` (PR gate + push) and `pack` (push to main/tags only, depends on build-and-test).
+3. **global.json SDK pinning** — Added `"sdk": {"version": "10.0.103", "rollForward": "latestFeature"}` for CI reproducibility.
+4. **.NET 10 preview in CI** — Uses `dotnet-version: '10.0.x'` with `dotnet-quality: 'preview'` since .NET 10 is in preview.
+5. **NuGet metadata** — PackageId, Description, Authors, License (MIT), RepositoryUrl, Tags added to .csproj.
+6. **README conditional** — PackageReadmeFile and README include use `Condition="Exists('..\..\README.md')"` since README doesn't exist yet.
+7. **dotnet test syntax** — .NET 10 requires `--solution` flag for .slnx files, not positional argument.
+
+**Key file paths:**
+- `.github/workflows/ci.yml` — CI pipeline
+- `src/Function.OpenApi/Function.OpenApi.csproj` — NuGet metadata + MinVer
+- `global.json` — SDK version pinning
+
+**Verification:** Build ✅ (0 warnings, 0 errors), 81/81 tests pass ✅, `dotnet pack` produces valid .nupkg ✅.
+
+**Next steps for Espen:**
+- Enable branch protection rule on `main` requiring `Build & Test` status check to pass before merging PRs
+- Tag `v0.1.0` (or desired initial version) when ready — MinVer will pick up the version automatically
+- When ready to publish to NuGet.org, add a `nuget-push` step with `NUGET_API_KEY` secret
+
+
+### CI Pipeline & NuGet Packaging Setup (2026-03-09T20:40Z)
+- **Task:** Set up GitHub Actions CI pipeline for NuGet packaging and PR validation
+- **Status:** SUCCESS

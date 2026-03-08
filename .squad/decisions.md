@@ -139,6 +139,37 @@ Removed all default placeholder names from the repository. No behavioral changes
 
 ---
 
+### 5. CI Pipeline & NuGet Packaging
+
+**Decision ID:** naomi-ci-nuget-packaging  
+**Owner:** Naomi (Lead / Architect)  
+**Date:** 2026-03-09  
+**Status:** Implemented
+
+Added GitHub Actions CI pipeline and configured the library for NuGet packaging with semantic versioning.
+
+**Key Decisions:**
+1. **MinVer** for versioning — tag-driven semver, no external tool installs, integrates as MSBuild package.
+2. **Two-job CI pipeline:** `build-and-test` runs on PRs and pushes; `pack` runs only on push to main/tags, gated behind test success.
+3. **global.json SDK pinning** at `10.0.103` with `latestFeature` rollForward for CI reproducibility.
+4. **.NET 10 preview** SDK in CI via `dotnet-quality: 'preview'`.
+
+**Files Changed:**
+- `.github/workflows/ci.yml` — New CI pipeline
+- `src/Function.OpenApi/Function.OpenApi.csproj` — NuGet metadata, MinVer dependency
+- `global.json` — SDK version pin
+
+**Verification:**
+- Build: ✅ Succeeds (0 warnings, 0 errors)
+- Tests: ✅ All pass (56/56)
+- Pipeline: ✅ Valid and ready for production use
+
+**Action Required:**
+- **Espen:** Enable GitHub branch protection rule on `main` requiring `Build & Test` status check
+- **Espen:** Tag `v0.1.0` when ready to set initial version (MinVer reads git tags)
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
