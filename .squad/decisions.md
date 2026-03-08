@@ -113,6 +113,32 @@ Removed all default placeholder names from the repository. No behavioral changes
 
 ---
 
+### 4. Correct byte/byte[] OpenAPI Schema Mappings
+
+**Decision ID:** naomi-byte-schema-mapping  
+**Owner:** Naomi (Lead / Architect)  
+**Date:** 2026-03-09  
+**Status:** Implemented
+
+**Context:** PR reviewer flagged that `System.Byte` and `System.Byte[]` shared a single switch case in both schema builders, producing identical output: `type: string, format: byte`.
+
+**Decision:** Split into distinct, spec-correct mappings:
+
+| C# Type | OpenAPI Type | Format | Schema ID |
+|---|---|---|---|
+| `System.Byte` | `integer` | `uint8` | `System.Byte` |
+| `System.Byte[]` | `string` | `byte` | `System.ByteArray` |
+
+**Rationale:** Per OpenAPI 3.0.4 §4.3, `format: byte` under `type: string` means "base64-encoded characters." `System.Byte` is an 8-bit unsigned integer (0–255) and must map to `type: integer`. The `uint8` format is a well-known extension for 8-bit unsigned integers. The schema ID collision could break `$ref` resolution in documents containing both types.
+
+**Implementation:** Bobbie wrote 14 unit tests (7 per builder) validating byte/byte[] mappings for both OpenAPI 3.0 and 3.1. All 81 tests pass (67 existing + 14 new).
+
+**Verification:** Build ✅, all tests ✅, spec-compliant ✅. Committed and pushed.
+
+**See:** `.squad/orchestration-log/2026-03-09T18-27-50Z-naomi.md` and `.squad/orchestration-log/2026-03-09T18-27-50Z-bobbie.md`.
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus

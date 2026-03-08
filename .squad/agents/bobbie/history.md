@@ -62,3 +62,22 @@
 - **Learning:** `OpenApiSchemaReference.Reference.Id` is the correct way to get reference IDs from the Microsoft.OpenApi library (not `ReferenceId`)
 - **Orchestration log:** See `.squad/orchestration-log/2026-03-08T15-35-bobbie.md`
 
+### Byte and Byte[] Schema Mapping Tests (2026-03-09)
+- **Task:** Write dedicated test coverage for `byte` and `byte[]` schema mappings following Naomi's bug fix
+- **The Bug:** `byte` (System.Byte) was incorrectly mapped to `string/byte` instead of `integer/uint8`
+- **The Fix:** `byte` → `integer/uint8` (8-bit unsigned integer, 0-255); `byte[]` → `string/byte` (base64-encoded binary data per OpenAPI spec)
+- **Key Insight:** Distinct schema IDs prevent collision: `System.Byte` vs `System.ByteArray`
+- **Test Coverage:** 14 new tests across OpenApi30SchemaBuilderTests and OpenApi31SchemaBuilderTests
+  - Primitive mapping tests: verify `byte` → integer/uint8, `byte[]` → string/byte with correct IDs
+  - Negative test: verify `byte` is NOT mapped to string/byte (the bug that was fixed)
+  - ByteTestModel tests: complex model with both byte and byte[] properties to verify no collision
+  - Property-level tests: verify individual properties map correctly
+  - Nullable tests: verify `byte?` and `byte[]?` maintain correct types with nullable flag
+- **Test Model:** Created `ByteTestModel.cs` with four properties: `SingleByte`, `BinaryData`, `NullableByte`, `NullableBinaryData`
+- **Test Results:** All 81 tests pass (67 existing + 14 new); comprehensive coverage for byte types in both OpenAPI 3.0 and 3.1
+- **Files Modified:**
+  - tests/Function.OpenApi.Tests/ByteTestModel.cs (created)
+  - tests/Function.OpenApi.Tests/Builders/OpenApi30SchemaBuilderTests.cs (added 7 tests)
+  - tests/Function.OpenApi.Tests/Builders/OpenApi31SchemaBuilderTests.cs (added 7 tests)
+- **Outcome:** Byte type fix is now test-verified for both OpenAPI 3.0 and 3.1; ready for merge.
+
