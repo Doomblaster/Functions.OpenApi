@@ -106,9 +106,14 @@ internal sealed class OpenApi31SchemaBuilder : OpenApiSchemaBuilderBase
                 schema.Format = "double";
                 schema.Id = "System.Double";
                 break;
-            case var _ when type == typeof(byte) || type == typeof(byte[]):
+            case var _ when type == typeof(byte[]):
                 schema.Type = JsonSchemaType.String;
                 schema.Format = "byte";
+                schema.Id = "System.ByteArray";
+                break;
+            case var _ when type == typeof(byte):
+                schema.Type = JsonSchemaType.Integer;
+                schema.Format = "uint8";
                 schema.Id = "System.Byte";
                 break;
             case var _ when type == typeof(bool):
