@@ -13,7 +13,7 @@ public static class ConfigurationExtensions
         var options = new OpenApiDocumentOptions();
         configure?.Invoke(options);
         services.AddSingleton(options);
-        services.AddSingleton<OpenApiDocumentBuilder>();
+        services.AddTransient<OpenApiDocumentBuilder>();
         services.AddSingleton<OpenApiJsonEndpoint>();
         services.AddSingleton<OpenApiUIEndpoint>();
         return services;

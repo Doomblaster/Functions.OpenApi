@@ -77,3 +77,14 @@
 - 7 commits total on branch (6 prior + 1 consolidating unstaged work)
 - Status: ✅ SUCCESS — all 56 tests pass
 
+### PR #1 Bug Fixes (2026-03-08)
+- Fixed 6 bugs identified in PR review, all on branch `squad/repo-restructure-and-multi-version-openapi`
+- **BUG 1 (Dictionary detection):** Added `IsDictionaryType()` and `GetDictionaryInterface()` helpers to `OpenApiSchemaBuilderBase` — checks both type itself AND implemented interfaces for `IDictionary<,>`. Updated both `OpenApi30SchemaBuilder` and `OpenApi31SchemaBuilder` to use these helpers. Also simplified `IsCollectionType()` to delegate to `IsDictionaryType()`.
+- **BUG 2 (Schema ID mismatch):** Changed primitive schema IDs from shorthand (`"double"`, `"byte"`, `"bool"`, `"date-time"`) to `GetFriendlyFullName()`-compatible format (`"System.Double"`, `"System.Byte"`, `"System.Boolean"`, `"System.DateTime"`). Applied to both 3.0 and 3.1 builders.
+- **BUG 3 (Static functions ignored):** Added `BindingFlags.Static` to `GetFunctionMethods()` in `OpenApiDocumentBuilder.Paths.cs` — isolated worker model supports static function methods.
+- **BUG 4 (Singleton stateful builder):** Changed `OpenApiDocumentBuilder` registration from `AddSingleton` to `AddTransient` in `ConfigurationExtensions.cs` — builder mutates state during document generation.
+- **BUG 5 (Culture-sensitive ToLower):** Changed `ToLower()` to `ToLowerInvariant()` in `GetHttpMethod()` — prevents Turkish locale issues.
+- **BUG 6 (Missing AttributeUsage):** Added `[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]` to `OpenApiRequestBodyAttribute` — consistent with sibling attributes.
+- Build: ✅ 0 errors, Tests: ✅ 56/56 pass, no regressions
+- **Key pattern learned:** Always use `ToLowerInvariant()` for programmatic string comparisons; always check interface implementations when detecting generic types like `IDictionary<,>`
+

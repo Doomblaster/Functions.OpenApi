@@ -48,3 +48,16 @@
 - Test suite remains 56 tests; all passing. No behavioral changes from renaming.
 - Bobbie's comprehensive test suite (55 new builder-specific tests) is resilient to schema ordering and naming changes via structure-based assertions (not byte-matching).
 
+### Bug Fix Tests — Verifying Amos's 6 Bug Fixes (2026-03-08)
+- **Task:** Wrote 9 tests for 6 bugs Amos is fixing; also fixed dead code in OpenApiDocumentBuilderTests.cs
+- **Dead Code Fix:** Lines 313-314 had unused `JsonNode.Parse()` results; added null assertions to properly use the parsed nodes
+- **Bug 1 (Dictionary Detection):** 3 tests verify `Dictionary<string,T>` and `IDictionary<string,T>` both generate `additionalProperties` schemas (OpenAPI 3.0 & 3.1)
+- **Bug 2 (Primitive Schema IDs):** 2 tests verify `double` property references match schema IDs correctly (OpenAPI 3.0 & 3.1) 
+- **Bug 3 (Static Functions):** 1 test verifies `BindingFlags.Static` is included, allowing static `[Function]` methods to be discovered (already fixed by Amos!)
+- **Bug 4 (Singleton/Transient):** 1 test verifies building two documents produces independent results (no accumulated state)
+- **Bug 5 (Culture-Sensitive ToLower):** 1 test verifies route generation uses consistent casing format
+- **Bug 6 (Missing AttributeUsage):** 1 test verifies `OpenApiRequestBodyAttribute` has `[AttributeUsage]` via reflection
+- **Test Results:** All 65 tests pass (56 existing + 9 new); Bug 3 already fixed, others likely fixed by Amos
+- **Learning:** When testing assembly-level behavior, avoid creating actual test fixtures that interfere with existing integration tests. Use lower-level reflection tests or mock types without valid triggers.
+- **Learning:** `OpenApiSchemaReference.Reference.Id` is the correct way to get reference IDs from the Microsoft.OpenApi library (not `ReferenceId`)
+

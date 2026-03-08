@@ -13,7 +13,7 @@ public partial class OpenApiDocumentBuilder
     {
         return [.. _options.Assemblies
             .SelectMany(a => a.GetExportedTypes())
-            .SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+            .SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
             .Where(m => m.GetCustomAttributes<FunctionAttribute>().Any())
             .Select(CreateMethodMetadata)];
     }
@@ -108,7 +108,7 @@ public partial class OpenApiDocumentBuilder
         return $"{method.Method.DeclaringType?.Name}{char.ToUpper(verb[0])}{verb[1..]}{functionName}";
     }
 
-    private static HttpMethod GetHttpMethod(string verb) => verb.ToLower() switch
+    private static HttpMethod GetHttpMethod(string verb) => verb.ToLowerInvariant() switch
     {
         "get" => HttpMethod.Get,
         "post" => HttpMethod.Post,

@@ -104,16 +104,16 @@ internal sealed class OpenApi30SchemaBuilder : OpenApiSchemaBuilderBase
             case var _ when type == typeof(double) || type == typeof(decimal):
                 schema.Type = JsonSchemaType.Number;
                 schema.Format = "double";
-                schema.Id = "double";
+                schema.Id = "System.Double";
                 break;
             case var _ when type == typeof(byte) || type == typeof(byte[]):
                 schema.Type = JsonSchemaType.String;
                 schema.Format = "byte";
-                schema.Id = "byte";
+                schema.Id = "System.Byte";
                 break;
             case var _ when type == typeof(bool):
                 schema.Type = JsonSchemaType.Boolean;
-                schema.Id = "bool";
+                schema.Id = "System.Boolean";
                 break;
             case var _ when type == typeof(DateOnly):
                 schema.Type = JsonSchemaType.String;
@@ -124,7 +124,7 @@ internal sealed class OpenApi30SchemaBuilder : OpenApiSchemaBuilderBase
             case var _ when type == typeof(DateTime) || type == typeof(DateTimeOffset):
                 schema.Type = JsonSchemaType.String;
                 schema.Format = "date-time";
-                schema.Id = "date-time";
+                schema.Id = "System.DateTime";
                 break;
             case var _ when type == typeof(Guid):
                 schema.Type = JsonSchemaType.String;
@@ -141,10 +141,11 @@ internal sealed class OpenApi30SchemaBuilder : OpenApiSchemaBuilderBase
                 schema.Items = reference;
                 schema.Id = friendlyName;
                 break;
-            case var _ when type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>):
+            case var _ when IsDictionaryType(type):
                 schema.Type = JsonSchemaType.Object;
                 schema.Id = GetFriendlyFullName(type);
-                var valueType = type.GetGenericArguments()[1];
+                var dictInterface = GetDictionaryInterface(type);
+                var valueType = dictInterface.GetGenericArguments()[1];
                 var valueTypeSchema = BuildComponentSchema(valueType);
                 schema.AdditionalProperties ??= new OpenApiSchemaReference(valueTypeSchema.Id!, Document);
                 break;

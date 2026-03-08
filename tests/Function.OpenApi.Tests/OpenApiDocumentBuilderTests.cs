@@ -313,6 +313,8 @@ public class OpenApiDocumentBuilderTests
         var actualNode = JsonNode.Parse(json);
         var expectedNode = JsonNode.Parse(expectedJson);
 
+        Assert.NotNull(actualNode);
+        Assert.NotNull(expectedNode);
         Assert.Equal(expectedJson.Replace("\r\n","\n"), json);
         
     }

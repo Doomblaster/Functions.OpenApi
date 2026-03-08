@@ -78,12 +78,26 @@ internal abstract class OpenApiSchemaBuilderBase : IOpenApiSchemaBuilder
         return $"{genericTypeName.TrimEnd('`', '1', '2', '3', '4')}_{args}";
     }
 
+    protected static bool IsDictionaryType(Type type)
+    {
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            return true;
+
+        return type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+    }
+
+    protected static Type GetDictionaryInterface(Type type)
+    {
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            return type;
+
+        return type.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+    }
+
     protected static bool IsCollectionType(Type type)
     {
-        var isDictionary = (type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
-            || type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
         return type != typeof(string)
-            && !isDictionary
+            && !IsDictionaryType(type)
             && typeof(IEnumerable).IsAssignableFrom(type)
             && GetCollectionItemType(type) != typeof(object);
     }
