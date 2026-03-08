@@ -27,3 +27,58 @@
 - **Post-migration capability:** Structure enables variant libraries, integration tests, and multiple sample apps without confusion
 - **Status:** Decision recorded in .squad/decisions.md (2026-03-08T13:13Z). Awaiting team approval before execution.
 
+### Multi-Version OpenAPI Architecture (2026-03-08)
+
+**Current Architecture Analysis:**
+- **Core builders:** `OpenApiDocumentBuilder` (partial class, 4 files) orchestrates document generation; `OpenApiSchemaBuilder` handles type-to-schema conversion
+- **Schema generation flow:** Scans Azure Functions methods → builds schemas from types → caches in Dictionary → flushes to Components.Schemas
+- **OpenAPI 3.0 hardcoding:** Spec version hardcoded in `OpenApiJsonEndpoint.cs:23` and tests; nullable handling uses `JsonSchemaType.Null | otherType` with `"nullable": true` extension (3.0 pattern)
+- **Cache mechanism:** `Dictionary<(Type, bool Nullable), OpenApiSchema>` in `OpenApiSchemaBuilder` prevents duplicate schema generation and Components.Schemas key collisions
+
+**OpenAPI 3.0 vs 3.1 Key Differences:**
+1. **Nullable handling (BREAKING):** 3.0 uses `"nullable": true` extension; 3.1 uses JSON Schema native `"type": ["string", "null"]` arrays
+2. **JSON Schema alignment:** 3.0 based on draft-04; 3.1 fully aligned with JSON Schema 2020-12
+3. **Example keyword:** 3.0 uses `"example"` (singular); 3.1 uses `"examples"` (array)
+4. **Schema references:** 3.0 only allows `$ref`; 3.1 allows combining `$ref` with other properties
+5. **Microsoft.OpenApi handling:** The library automatically serializes nullable types correctly based on `OpenApiSpecVersion` passed to serialization; our schema construction doesn't need to change for nullable *if* we set the Type flag correctly
+
+**Proposed Refactoring Architecture:**
+- **Abstraction:** Introduce `IOpenApiSchemaBuilder` interface with `SpecVersion`, `BuildComponentSchema()`, `BuildSchemaFromPropertyInfo()`, `FlushToDocument()`
+- **Base class:** `OpenApiSchemaBuilderBase` provides common logic (caching, type name generation, nullability checking, collection detection)
+- **Version-specific implementations:** `OpenApi30SchemaBuilder` (current behavior) and `OpenApi31SchemaBuilder` (Examples array, JSON Schema 2020-12 semantics)
+- **Factory pattern:** `OpenApiSchemaBuilderFactory.Create(document, specVersion)` returns correct builder
+- **Configuration:** Add `OpenApiDocumentOptions.SpecVersion` property (default: `OpenApi3_0` for backward compatibility)
+- **Endpoint update:** `OpenApiJsonEndpoint` uses configured spec version instead of hardcoded value
+
+**Cache Analysis Verdict: KEEP with improvements**
+- **Problem solved:** Prevents duplicate schema generation, avoids Components.Schemas key collisions, improves performance via type reflection caching
+- **Cache necessity:** Yes — without it, multiple properties of same type would create duplicate schemas and cause Dictionary.Add() collisions
+- **Thread safety issue (MEDIUM):** Dictionary not thread-safe; currently low risk (per-request builder), future risk if concurrent builds needed; recommend documenting limitation or using ConcurrentDictionary
+- **Nullable cache key bug (MEDIUM):** Current implementation can cache `Guid?` with two different keys: `(typeof(Guid?), true)` from BuildSchemaFromPropertyInfo and `(typeof(Guid?), false)` from BuildComponentSchema; solution: normalize cache key to use underlying type + explicit nullable flag
+- **Memory retention (LOW):** Cache scoped to single BuildDocument() call, cleared on GC; acceptable for typical usage
+- **Fix required:** Implement `GetCacheKey(Type, bool)` helper to normalize nullable value types to their underlying type before caching
+
+**Backward Compatibility Strategy:**
+- Default `SpecVersion = OpenApi3_0` ensures zero breaking changes for existing consumers
+- All existing tests pass without modification
+- New functionality (3.1 support) is opt-in via configuration
+
+**Refactoring Phases:**
+1. **Foundation (low risk):** Create interface, base class, refactor existing builder to `OpenApi30SchemaBuilder`
+2. **OpenAPI 3.1 (medium risk):** Implement `OpenApi31SchemaBuilder` with Examples array and JSON Schema 2020-12 semantics
+3. **Integration (medium risk):** Wire up factory, add SpecVersion to options, update endpoint serialization
+4. **Testing (low risk):** Comprehensive unit + integration tests for both 3.0 and 3.1
+5. **Future (optional):** Thread-safe cache, schema $id support, contentSchema in 3.1
+
+**Risk Assessment:**
+- **High-risk areas:** Factory integration in InitializeDocument(), cache key normalization, endpoint spec version plumbing
+- **Mitigation:** Comprehensive testing at each step, byte-for-byte JSON comparison for 3.0 output, integration tests for 3.1
+- **Rollback plan:** Revert to original OpenApiSchemaBuilder if Phase 1-2 issues; keep refactored builders but revert integration if Phase 3 issues
+
+**Extensibility for Future Versions:**
+- Add new `OpenApiXYSchemaBuilder` inheriting from base class
+- Update factory switch statement
+- No changes to core document builder or configuration (just new enum value)
+
+**Decision Status:** Proposed, awaiting Espen approval. Estimated effort: 5-6 days (Amos 3-4 days implementation, Bobbie 2 days testing).
+

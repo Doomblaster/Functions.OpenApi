@@ -19,3 +19,11 @@
 - Naomi produced restructuring plan: move tests to tests/ directory (maintains same test harness, updates ProjectReference path from ..\ to ..\..\src\)
 - Plan follows .NET conventions; enables multi-version support and multiple test project variants in future
 - Migration uses git mv to preserve history; no test code changes needed, only path updates in .csproj and solution file
+
+### Multi-Version OpenAPI Refactoring Proposed (2026-03-08)
+- Naomi completed architecture analysis: refactoring strategy documented with IOpenApiSchemaBuilder interface + version-specific implementations
+- Refactoring plan includes comprehensive 5-phase approach: Foundation, 3.1 implementation, Integration, Testing, Future enhancements
+- Cache evaluation: KEEP with nullable key normalization fix to prevent duplicate schemas and Components.Schemas collisions
+- Testing scope: Comprehensive unit + integration tests for both 3.0 and 3.1, byte-for-byte JSON comparison for backward compatibility
+- Estimated effort: 5–6 days total; Bobbie allocated 2 days for testing phase
+- STATUS: Awaiting Espen approval before Phase 1 (foundation) execution
