@@ -257,3 +257,13 @@
 ### CI Pipeline & NuGet Packaging Setup (2026-03-09T20:40Z)
 - **Task:** Set up GitHub Actions CI pipeline for NuGet packaging and PR validation
 - **Status:** SUCCESS
+
+### Branch Protection & v0.1.0 Tag (2026-03-10)
+- **Branch protection:** BLOCKED — repo is private on GitHub Free plan. Both branch protection rules (`/branches/main/protection`) and repository rulesets (`/rulesets`) require GitHub Pro or a public repo. Must either upgrade plan or make repo public.
+- **v0.1.0 tag:** SUCCESS — tagged and pushed. MinVer will now derive package versions from `v0.1.0` (e.g., `0.1.0-alpha.N` on branches, `0.1.0` on tagged commits).
+- **Key learning:** GitHub Free private repos cannot use branch protection or rulesets via API. This is a platform limitation, not a configuration issue.
+---
+
+### Orchestration Summary (2026-03-08T21:43:30Z)
+- **Task:** Document outcomes and transition to decision governance
+- **Scribe action:** Orchestration log written, session log written, branch protection decision merged to decisions.md, inbox cleared, cross-agent history updated
