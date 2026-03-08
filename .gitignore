@@ -1,8 +1,8 @@
 .vs/
 **/bin/
 **/obj/
+.copilot/config.json
 .copilot/logs/
-.copilot/config.local.json
 # Squad: ignore runtime state (logs, inbox, sessions)
 .squad/orchestration-log/
 .squad/log/
