@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Function.OpenApi\Function.OpenApi.csproj" />
+    <ProjectReference Include="..\..\src\Function.OpenApi\Function.OpenApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
