@@ -95,6 +95,42 @@ public class OpenApi31SchemaBuilderTests
     }
 
     [Fact]
+    public void BuildComponentSchema_Byte_ReturnsIntegerUint8Schema()
+    {
+        var builder = CreateBuilder();
+
+        var schema = builder.BuildComponentSchema(typeof(byte));
+
+        Assert.Equal(JsonSchemaType.Integer, schema.Type);
+        Assert.Equal("uint8", schema.Format);
+        Assert.Equal("System.Byte", schema.Id);
+    }
+
+    [Fact]
+    public void BuildComponentSchema_ByteArray_ReturnsStringByteSchema()
+    {
+        var builder = CreateBuilder();
+
+        var schema = builder.BuildComponentSchema(typeof(byte[]));
+
+        Assert.Equal(JsonSchemaType.String, schema.Type);
+        Assert.Equal("byte", schema.Format);
+        Assert.Equal("System.ByteArray", schema.Id);
+    }
+
+    [Fact]
+    public void BuildComponentSchema_Byte_DoesNotMapToStringByte()
+    {
+        var builder = CreateBuilder();
+
+        var schema = builder.BuildComponentSchema(typeof(byte));
+
+        // Verify this is NOT string/byte (that was the bug)
+        Assert.NotEqual(JsonSchemaType.String, schema.Type);
+        Assert.NotEqual("byte", schema.Format);
+    }
+
+    [Fact]
     public void BuildComponentSchema_Enum_MatchesOpenApi30()
     {
         var builder = CreateBuilder();
@@ -135,6 +171,52 @@ public class OpenApi31SchemaBuilderTests
         Assert.NotNull(schema.Items);
     }
 
+    [Fact]
+    public void BuildComponentSchema_ByteTestModel_HasDistinctSchemaIdsForByteAndByteArray()
+    {
+        var builder = CreateBuilder();
+
+        var schema = builder.BuildComponentSchema(typeof(ByteTestModel));
+
+        Assert.Equal(JsonSchemaType.Object, schema.Type);
+        Assert.NotNull(schema.Properties);
+        Assert.Contains("singleByte", schema.Properties.Keys);
+        Assert.Contains("binaryData", schema.Properties.Keys);
+
+        // Build byte and byte[] individually to verify distinct IDs
+        var byteSchema = builder.BuildComponentSchema(typeof(byte));
+        var byteArraySchema = builder.BuildComponentSchema(typeof(byte[]));
+
+        Assert.NotEqual(byteSchema.Id, byteArraySchema.Id);
+        Assert.Equal("System.Byte", byteSchema.Id);
+        Assert.Equal("System.ByteArray", byteArraySchema.Id);
+    }
+
+    [Fact]
+    public void BuildComponentSchema_ByteTestModel_SingleByteProperty_IsIntegerUint8()
+    {
+        var builder = CreateBuilder();
+        var property = typeof(ByteTestModel).GetProperty(nameof(ByteTestModel.SingleByte))!;
+
+        var schema = builder.BuildSchemaFromPropertyInfo(property);
+
+        Assert.Equal(JsonSchemaType.Integer, schema.Type);
+        Assert.Equal("uint8", schema.Format);
+    }
+
+    [Fact]
+    public void BuildComponentSchema_ByteTestModel_BinaryDataProperty_IsStringByte()
+    {
+        var builder = CreateBuilder();
+        var property = typeof(ByteTestModel).GetProperty(nameof(ByteTestModel.BinaryData))!;
+
+        var schema = builder.BuildSchemaFromPropertyInfo(property);
+
+        // Should be string/byte for base64-encoded content
+        Assert.True(schema.Type!.Value.HasFlag(JsonSchemaType.String));
+        Assert.Equal("byte", schema.Format);
+    }
+
     #endregion
 
     #region Nullable Handling (same schema construction, different serialization)
@@ -160,6 +242,32 @@ public class OpenApi31SchemaBuilderTests
         var schema = builder.BuildSchemaFromPropertyInfo(property);
 
         Assert.True(schema.Type!.Value.HasFlag(JsonSchemaType.Null));
+    }
+
+    [Fact]
+    public void BuildSchemaFromPropertyInfo_NullableByte_ReturnsNullableIntegerSchema()
+    {
+        var builder = CreateBuilder();
+        var property = typeof(ByteTestModel).GetProperty(nameof(ByteTestModel.NullableByte))!;
+
+        var schema = builder.BuildSchemaFromPropertyInfo(property);
+
+        Assert.True(schema.Type!.Value.HasFlag(JsonSchemaType.Null));
+        Assert.True(schema.Type!.Value.HasFlag(JsonSchemaType.Integer));
+        Assert.Equal("uint8", schema.Format);
+    }
+
+    [Fact]
+    public void BuildSchemaFromPropertyInfo_NullableByteArray_ReturnsNullableStringSchema()
+    {
+        var builder = CreateBuilder();
+        var property = typeof(ByteTestModel).GetProperty(nameof(ByteTestModel.NullableBinaryData))!;
+
+        var schema = builder.BuildSchemaFromPropertyInfo(property);
+
+        Assert.True(schema.Type!.Value.HasFlag(JsonSchemaType.Null));
+        Assert.True(schema.Type!.Value.HasFlag(JsonSchemaType.String));
+        Assert.Equal("byte", schema.Format);
     }
 
     #endregion
