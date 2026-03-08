@@ -87,4 +87,5 @@
 - **BUG 6 (Missing AttributeUsage):** Added `[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]` to `OpenApiRequestBodyAttribute` — consistent with sibling attributes.
 - Build: ✅ 0 errors, Tests: ✅ 56/56 pass, no regressions
 - **Key pattern learned:** Always use `ToLowerInvariant()` for programmatic string comparisons; always check interface implementations when detecting generic types like `IDictionary<,>`
+- **Orchestration log:** See `.squad/orchestration-log/2026-03-08T15-35-amos.md`
 

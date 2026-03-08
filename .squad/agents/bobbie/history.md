@@ -60,4 +60,5 @@
 - **Test Results:** All 65 tests pass (56 existing + 9 new); Bug 3 already fixed, others likely fixed by Amos
 - **Learning:** When testing assembly-level behavior, avoid creating actual test fixtures that interfere with existing integration tests. Use lower-level reflection tests or mock types without valid triggers.
 - **Learning:** `OpenApiSchemaReference.Reference.Id` is the correct way to get reference IDs from the Microsoft.OpenApi library (not `ReferenceId`)
+- **Orchestration log:** See `.squad/orchestration-log/2026-03-08T15-35-bobbie.md`
 
