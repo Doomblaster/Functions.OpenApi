@@ -75,7 +75,9 @@ internal abstract class OpenApiSchemaBuilderBase : IOpenApiSchemaBuilder
         var genericArgs = type.GetGenericArguments();
         var args = string.Join("_", genericArgs.Select(GetFriendlyFullName));
         var genericTypeName = genericTypeDef.FullName ?? genericTypeDef.Name;
-        return $"{genericTypeName.TrimEnd('`', '1', '2', '3', '4')}_{args}";
+        var backtickIndex = genericTypeName.IndexOf('`');
+        var baseName = backtickIndex >= 0 ? genericTypeName[..backtickIndex] : genericTypeName;
+        return $"{baseName}_{args}";
     }
 
     protected static bool IsDictionaryType(Type type)

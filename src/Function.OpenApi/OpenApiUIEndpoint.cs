@@ -24,7 +24,7 @@ internal class OpenApiUIEndpoint
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
     <script>
       Scalar.createApiReference('#app', {
-        url: '/api/openapi.json'
+        url: 'openapi.json'
       })
     </script>
   </body>

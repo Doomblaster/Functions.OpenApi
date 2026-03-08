@@ -55,7 +55,16 @@ public partial class OpenApiDocumentBuilder
 
             response.Content.Add(responseAttribute.ContentType, mediaType);
             operation.Responses ??= [];
-            operation.Responses.Add(((int)responseAttribute.HttpStatusCode).ToString(), response);
+            var statusCode = ((int)responseAttribute.HttpStatusCode).ToString();
+            if (!operation.Responses.TryAdd(statusCode, response))
+            {
+                var existing = operation.Responses[statusCode];
+                if (existing.Content is { } existingContent)
+                {
+                    foreach (var content in response.Content)
+                        existingContent.TryAdd(content.Key, content.Value);
+                }
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Testing.Platform.Logging;
+using Microsoft.Extensions.Logging;
 
 using Function.OpenApi;
 using Function.OpenApi.Tests;
