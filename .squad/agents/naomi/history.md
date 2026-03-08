@@ -107,6 +107,14 @@
 - **Verification:** Build ✅ 65/65 tests pass, no regressions
 - **Orchestration log:** `.squad/orchestration-log/2026-03-08T18-05-naomi.md`
 
+### PR #1 Squash Merge into main (2026-03-08T18:58Z)
+- **Task:** Squash-merge PR #1 into main branch
+- **Status:** ✅ **Merge completed successfully**
+- **Commit SHA:** 1e1ae90
+- **Source branch:** Deleted post-merge
+- **Verification:** All 65 tests pass, backward compatibility maintained
+- **Orchestration log:** `.squad/orchestration-log/2026-03-08T185800Z-naomi.md`
+
 ## Learnings
 
 ### Repository Restructuring Decision (2026-03-08)
