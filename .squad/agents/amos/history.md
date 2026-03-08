@@ -70,3 +70,9 @@
 - **Windows git mv workaround:** folder rename required temp name trick (same as restructuring) due to file locks from obj/bin
 - All 56 tests pass, build succeeds with 0 errors
 
+### Branch & PR Created (2026-03-08)
+- Branch: `squad/repo-restructure-and-multi-version-openapi`
+- PR: #1 — "feat: Repository restructuring and multi-version OpenAPI support"
+- Includes all work: repo restructuring, multi-version OpenAPI refactoring (interface/factory), repo cleanup (renamed defaults, removed dead code)
+- 7 commits total on branch (6 prior + 1 consolidating unstaged work)
+
