@@ -15,4 +15,7 @@
 
 ## Learnings
 
-<!-- Append new learnings below. Each entry is something lasting about the project. -->
+### Repository Restructuring (2026-03-08)
+- Naomi produced restructuring plan: move tests to tests/ directory (maintains same test harness, updates ProjectReference path from ..\ to ..\..\src\)
+- Plan follows .NET conventions; enables multi-version support and multiple test project variants in future
+- Migration uses git mv to preserve history; no test code changes needed, only path updates in .csproj and solution file

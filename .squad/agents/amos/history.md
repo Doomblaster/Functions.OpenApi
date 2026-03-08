@@ -16,4 +16,8 @@
 
 ## Learnings
 
-<!-- Append new learnings below. Each entry is something lasting about the project. -->
+### Repository Restructuring (2026-03-08)
+- Naomi produced comprehensive restructuring plan (src/tests/samples layout) per team decision to organize codebase per .NET conventions
+- Plan includes: current state, proposed structure, file-by-file path updates, step-by-step migration using git mv, risk assessment, post-migration checklist
+- Tests remain coupled to main library via ProjectReference; restructuring updates paths from ..\ to ..\..\src\
+- Low execution risk; git history preserved; main breakage is IDE/contributor workflow (mitigated by communication and clear steps)

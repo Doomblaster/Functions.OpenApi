@@ -15,4 +15,7 @@
 
 ## Learnings
 
-<!-- Append new learnings below. Each entry is something lasting about the project. -->
+### Repository Restructuring (2026-03-08)
+- Naomi produced restructuring plan: move FunctionApp1 sample to samples/ directory (maintains same structure and functionality, updates ProjectReference path from ..\ to ..\..\src\)
+- Samples separated from tests in new layout; enables multiple demo/sample applications without confusion
+- Plan follows .NET conventions; uses git mv for history preservation; no code changes needed, only path updates in .csproj and solution file

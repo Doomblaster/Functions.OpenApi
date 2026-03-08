@@ -16,4 +16,14 @@
 
 ## Learnings
 
-<!-- Append new learnings below. Each entry is something lasting about the project. -->
+### Restructuring Decision (2026-03-08)
+- **Repository layout:** Currently flat (Function.OpenApi/, Function.OpenApi.Tests/, FunctionApp1/ at root). Proposed: src/, tests/, samples/
+- **Project structure:** 3 projects total — main library, xUnit v3 tests (Microsoft.Testing.Platform runner), sample Azure Functions app (isolated worker)
+- **Project references:** Tests and samples both reference main library via relative paths (..\ from peer directories). After restructuring, will use ..\..\src\ paths.
+- **Config files:** Solution file (.slnx) contains 3 project entries with relative paths; global.json and nuget.config need no changes
+- **CI/CD:** Existing .github/workflows are squad infrastructure (heartbeat, triage, labels) — no project-specific path references. Future CI workflows will need path updates.
+- **Rationale:** Standard .NET convention; enables clear separation of library, tests, samples; future-proofs for multi-version support (3.0, 3.1) where version-specific builders/projects may be isolated into src/
+- **Risk profile:** Low; git history preserved with git mv; breaking change is IDE/contributor workflow (mitigated by communication and clear steps)
+- **Post-migration capability:** Structure enables variant libraries, integration tests, and multiple sample apps without confusion
+- **Status:** Decision recorded in .squad/decisions.md (2026-03-08T13:13Z). Awaiting team approval before execution.
+
