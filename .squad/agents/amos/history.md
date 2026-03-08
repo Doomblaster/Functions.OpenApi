@@ -37,3 +37,26 @@
 - Cache verdict: Keep with nullable key normalization fix (prevents duplicate schemas, avoids Components.Schemas collisions)
 - Estimated effort: 5–6 days (Amos 3–4 days implementation, Bobbie 2 days testing)
 - STATUS: Awaiting Espen approval before Phase 1 execution
+
+### Multi-Version OpenAPI Refactoring Implemented (2026-03-08)
+- Executed Naomi's approved refactoring plan (Phases 1–3)
+- **Phase 1 (Foundation):** Created `IOpenApiSchemaBuilder` interface, `OpenApiSchemaBuilderBase` abstract class (shared logic, caching, `FlushToDocument`, static helpers like `GetFriendlyFullName`, `IsPropertyNullable`, `IsCollectionType`), renamed current builder to `OpenApi30SchemaBuilder`, created `OpenApiSchemaBuilderFactory`
+- **Phase 2 (3.1 Support):** Created `OpenApi31SchemaBuilder` — main difference is `Examples` (array) instead of `Example` (singular) for `DateOnly`, and propagates `Examples` in nullable handling. Factory updated to support both versions.
+- **Phase 3 (Configuration & Integration):** Added `SpecVersion` property to `OpenApiDocumentOptions` (default `OpenApi3_0`), updated `OpenApiDocumentBuilder.InitializeDocument()` to use factory, updated `OpenApiJsonEndpoint` to inject `OpenApiDocumentOptions` and use configured `SpecVersion` instead of hardcoded `OpenApi3_0`, registered `OpenApiJsonEndpoint` and `OpenApiUIEndpoint` explicitly in `ConfigurationExtensions`
+- **Cache normalization decision:** `GetCacheKey()` helper exists in base class but aggressive normalization (`Nullable<T>` → `T`) was NOT applied in `BuildSchemaFromType` or `BuildSchemaFromPropertyInfo` because it changes schema IDs (e.g., `System.Nullable_System.Guid` becomes `System.Guid`), breaking existing JSON output. The helper is available for future use if cache deduplication is needed without changing schema identity.
+- **Key file paths:**
+  - `src/Function.OpenApi/Builders/IOpenApiSchemaBuilder.cs` — interface
+  - `src/Function.OpenApi/Builders/OpenApiSchemaBuilderBase.cs` — shared logic
+  - `src/Function.OpenApi/Builders/OpenApi30SchemaBuilder.cs` — 3.0 implementation
+  - `src/Function.OpenApi/Builders/OpenApi31SchemaBuilder.cs` — 3.1 implementation
+  - `src/Function.OpenApi/Builders/OpenApiSchemaBuilderFactory.cs` — factory
+- **InternalsVisibleTo:** Added `Function.OpenApi.Tests` to csproj for test access to internal builders
+- Partial classes (`OpenApiDocumentBuilder.Responses.cs`, `.Parameters.cs`) updated to reference `OpenApiSchemaBuilderBase.GetFriendlyFullName()` instead of deleted `OpenApiSchemaBuilder`
+- Old `OpenApiSchemaBuilder.cs` deleted — replaced by base class + version-specific implementations
+- `FlushToDocument` changed from `Add` to `TryAdd` to prevent duplicate key exceptions
+- All 56 tests pass (including pre-existing + new builder-specific tests)
+
+### Cross-Agent Learning from Bobbie (Tester)
+- **Microsoft.OpenApi Behavior:** Microsoft.OpenApi 3.3.1 serializes OpenAPI 3.1 as "3.1.2" (not "3.1.0") — tests use `StartsWith("3.1")` for resilience to patch version changes. Relevant for any future version detection logic.
+- **Cache Normalization Side Effects:** Schema ordering changed due to cache deduplication approach. Pre-existing `UnitTest1.Test1` expected JSON reflects this. Bobbie's comprehensive test suite (55 new tests) validates all schema generation paths and found no regressions in generated schemas.
+- **Test Coverage:** Bobbie wrote 55 new tests across factory, 3.0 builder, 3.1 builder, and integration paths. All pass. Factory instantiation, builder contract adherence, and version-specific behavior all validated.

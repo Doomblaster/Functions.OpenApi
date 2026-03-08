@@ -1,0 +1,15 @@
+docs: merge Naomi's refactoring plan and update team histories
+
+- Add orchestration log for Naomi analysis (2026-03-08T13:32Z)
+- Add session log for refactoring plan (2026-03-08T13:32Z)
+- Merge naomi-library-refactoring decision from inbox to decisions.md
+- Update Amos history: multi-version OpenAPI refactoring proposed
+- Update Bobbie history: testing strategy and effort allocation (2 days)
+- Update Naomi history: refactoring plan completion and Espen approval waiting
+
+Decision: IOpenApiSchemaBuilder interface + version-specific implementations
+Estimated effort: 5–6 days (Amos 3–4, Bobbie 2 for testing)
+Cache verdict: Keep with nullable key normalization fix
+Backward compatible: Default SpecVersion = OpenApi3_0
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

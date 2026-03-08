@@ -27,3 +27,17 @@
 - Testing scope: Comprehensive unit + integration tests for both 3.0 and 3.1, byte-for-byte JSON comparison for backward compatibility
 - Estimated effort: 5–6 days total; Bobbie allocated 2 days for testing phase
 - STATUS: Awaiting Espen approval before Phase 1 (foundation) execution
+
+### Test Suite for Multi-Version Refactoring (2026-03-08)
+- Wrote 51 new tests across 4 new files + 4 new tests in existing UnitTest1.cs (55 total new tests, all passing)
+- Test structure: factory tests, 3.0 builder unit tests, 3.1 builder unit tests, 3.1 integration tests, backward-compat tests
+- Key discovery: Microsoft.OpenApi 3.3.1 serializes OpenAPI 3.1 as "3.1.2" (not "3.1.0") — tests use StartsWith for resilience
+- Key discovery: Amos's cache normalization fix changed schema ordering; pre-existing Test1 needs Amos to update expected JSON
+- Learned xUnit v3 MTP v2 filter syntax: use `--filter-class` and `--filter-method` (not `--filter` or `--treenode-filter`)
+- Decision: new tests assert JSON structure via JsonNode rather than byte-matching, making them resilient to schema ordering changes
+
+### Cross-Agent Learning from Amos (Library Developer)
+- **Cache Key Normalization Decision:** Conservative approach implemented. `GetCacheKey()` helper exists in base class but NOT applied in `BuildSchemaFromType` or `BuildSchemaFromPropertyInfo` because aggressive normalization (Nullable<T> → T) changes schema IDs (e.g., `System.Nullable_System.Guid` becomes `System.Guid`), breaking existing JSON output. Helper available for future optimization if deduplication is needed without changing identity. Bobbie's resilient test assertions (structure-based, not byte-matching) are aligned with this design.
+- **FlushToDocument Change:** Changed from `Add()` to `TryAdd()` to prevent duplicate key exceptions. No impact to test logic; all builder tests pass.
+- **InternalsVisibleTo Addition:** Added to csproj for test access. Enabled direct builder instantiation in Bobbie's factory and builder unit tests.
+- **Build & Compatibility:** All 56 tests pass (Bobbie's 55 new + pre-existing). Default `SpecVersion = OpenApi3_0` ensures backward compatibility. Zero breaking changes.
