@@ -60,3 +60,13 @@
 - **Microsoft.OpenApi Behavior:** Microsoft.OpenApi 3.3.1 serializes OpenAPI 3.1 as "3.1.2" (not "3.1.0") — tests use `StartsWith("3.1")` for resilience to patch version changes. Relevant for any future version detection logic.
 - **Cache Normalization Side Effects:** Schema ordering changed due to cache deduplication approach. Pre-existing `UnitTest1.Test1` expected JSON reflects this. Bobbie's comprehensive test suite (55 new tests) validates all schema generation paths and found no regressions in generated schemas.
 - **Test Coverage:** Bobbie wrote 55 new tests across factory, 3.0 builder, 3.1 builder, and integration paths. All pass. Factory instantiation, builder contract adherence, and version-specific behavior all validated.
+
+### Repository Cleanup — Default Name Removal (2026-03-08)
+- **Sample project renamed:** `samples/FunctionApp1/` → `samples/Function.OpenApi.Sample/`, `FunctionApp1.csproj` → `Function.OpenApi.Sample.csproj`, `Function1.cs` → `SampleFunctions.cs`, class `Function1` → `SampleFunctions`, namespace `FunctionApp1` → `Function.OpenApi.Sample`
+- **Test fixture renamed:** `tests/.../Function1.cs` → `TestFunctions.cs`, class `Function1` → `TestFunctions`; updated all `typeof(Function1)` references and operationIds in expected JSON across 3 test files
+- **Test file renamed:** `UnitTest1.cs` → `OpenApiDocumentBuilderTests.cs`, class `UnitTest1` → `OpenApiDocumentBuilderTests`, test method `Test1` → `FullDocument_SerializesExpectedJson`
+- **Unused code removed:** duplicate `using System.Linq;` and unused `using System.Text.Json;`, `using System.Threading.Tasks;` from `OpenApiDocumentBuilderTests.cs`; unused `RemoveDateOnlyExample` private method; commented-out `PackageReference` for `Microsoft.Azure.Functions.Worker.Sdk` in test csproj
+- **Solution file updated:** `Function.OpenApi.slnx` path updated to `samples/Function.OpenApi.Sample/Function.OpenApi.Sample.csproj`
+- **Windows git mv workaround:** folder rename required temp name trick (same as restructuring) due to file locks from obj/bin
+- All 56 tests pass, build succeeds with 0 errors
+

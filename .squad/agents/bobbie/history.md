@@ -41,3 +41,10 @@
 - **FlushToDocument Change:** Changed from `Add()` to `TryAdd()` to prevent duplicate key exceptions. No impact to test logic; all builder tests pass.
 - **InternalsVisibleTo Addition:** Added to csproj for test access. Enabled direct builder instantiation in Bobbie's factory and builder unit tests.
 - **Build & Compatibility:** All 56 tests pass (Bobbie's 55 new + pre-existing). Default `SpecVersion = OpenApi3_0` ensures backward compatibility. Zero breaking changes.
+
+### Repository Cleanup — Test File Renaming (2026-03-08)
+- Amos renamed test files as part of overall cleanup: `UnitTest1.cs` → `OpenApiDocumentBuilderTests.cs`, test fixture `Function1.cs` → `TestFunctions.cs`
+- Updated all test reference files: operationIds in expected JSON changed from `Function1Get*`/`Function1Post*` → `TestFunctionsGet*`/`TestFunctionsPost*`
+- Test suite remains 56 tests; all passing. No behavioral changes from renaming.
+- Bobbie's comprehensive test suite (55 new builder-specific tests) is resilient to schema ordering and naming changes via structure-based assertions (not byte-matching).
+

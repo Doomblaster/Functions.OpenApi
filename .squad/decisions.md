@@ -40,14 +40,40 @@ This improves organization, follows .NET community standards, and supports scala
 
 ---
 
-### 2. Library Refactoring for Multi-Version OpenAPI Support
+### 2. Repository Cleanup — Default Name Removal
+
+**Decision ID:** amos-repo-cleanup  
+**Owner:** Amos (Library Developer)  
+**Date:** 2026-03-08  
+**Status:** Implemented  
+**Requested by:** Espen
+
+Removed all default placeholder names from the repository. No behavioral changes — purely naming and dead code cleanup.
+
+**Changes:**
+- `samples/FunctionApp1/` → `samples/Function.OpenApi.Sample/`
+- `FunctionApp1.csproj` → `Function.OpenApi.Sample.csproj`
+- `samples/.../Function1.cs` → `SampleFunctions.cs` (class name, namespace updated)
+- `tests/.../UnitTest1.cs` → `OpenApiDocumentBuilderTests.cs` (class name, method names)
+- `tests/.../Function1.cs` → `TestFunctions.cs` (test fixture class)
+- Removed duplicate usings, unused methods, commented-out package references
+- Updated 5+ reference files (solution, Program.cs, test files with operationId expectations)
+
+**Verification:**
+- Build: ✅ 0 errors
+- Tests: ✅ 56/56 pass
+- No behavioral changes to library or test coverage
+
+**See:** `.squad/orchestration-log/2026-03-08T14-06-amos.md` for detailed implementation notes.
+
+---
+
+### 3. Library Refactoring for Multi-Version OpenAPI Support
 
 **Decision ID:** naomi-library-refactoring  
 **Owner:** Naomi (Lead / Architect)  
 **Date:** 2026-03-08  
 **Status:** Implemented
-
-Refactor the Functions.OpenApi library to support multiple OpenAPI specification versions (3.0, 3.1, and future versions) while maintaining backward compatibility.
 
 **Approved Architecture:**
 - `IOpenApiSchemaBuilder` interface with version-specific implementations ✅
