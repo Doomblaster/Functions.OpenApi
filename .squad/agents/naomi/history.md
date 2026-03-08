@@ -82,3 +82,20 @@
 
 **Decision Status:** Proposed, awaiting Espen approval. Estimated effort: 5-6 days (Amos 3-4 days implementation, Bobbie 2 days testing).
 
+### PR #1 Review (2026-03-08)
+
+**Context:** Reviewed 13 automated review comments from `copilot-pull-request-reviewer` on PR #1 (feat: Repository restructuring and multi-version OpenAPI support).
+
+**Key findings verified and triaged:**
+- **Dictionary handling bug (3.0 + 3.1):** Confirmed — only `IDictionary<,>` interface matched, concrete `Dictionary<K,V>` falls through to object reflection. Real bug, needs fix.
+- **Singleton registration of stateful builder:** Confirmed — `OpenApiDocumentBuilder` is registered as singleton but mutates `_document` and `_schemaBuilder` per call. Race condition under concurrent requests.
+- **Static function methods not scanned:** Confirmed — `BindingFlags.Public | BindingFlags.Instance` excludes static Azure Functions. Real gap.
+- **Primitive schema ID mismatch:** Confirmed — IDs like "double", "byte", "bool" don't match `GetFriendlyFullName()` output. Could break `$ref` resolution.
+- **Culture-sensitive `ToLower()`:** Confirmed — Turkish-I problem applies. Quick fix.
+- **Missing `[AttributeUsage]` on `OpenApiRequestBodyAttribute`:** Confirmed — other attributes have it, this one doesn't. Consistency issue.
+- **Hardcoded Scalar UI URL:** Confirmed — `/api/openapi.json` hardcoded. Breaks with custom route prefixes.
+- **Config files with machine-specific paths:** Confirmed — `.squad/config.json`, `.copilot/config.json`, `.copilot/mcp-config.json` contain local paths/user data.
+- **Unused JSON parsing in test:** Confirmed — dead code in assertion.
+
+**Decision:** 6 comments are actionable bugs (Amos), 3 are config hygiene (Espen decision), 1 is test cleanup (Bobbie), 3 are duplicates of the dictionary/schema-ID issues across 3.0/3.1 builders.
+
