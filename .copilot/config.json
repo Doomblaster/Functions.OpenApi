@@ -1,0 +1,12 @@
+{
+  "last_logged_in_user": {
+    "host": "https://github.com",
+    "login": "Doomblaster"
+  },
+  "banner": "never",
+  "render_markdown": true,
+  "trusted_folders": [
+    "D:\\Repos\\vikenskog\\SkogHub.Backend",
+    "D:\\Repos\\Function.OpenApi"
+  ]
+}
