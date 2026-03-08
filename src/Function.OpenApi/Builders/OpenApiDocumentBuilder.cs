@@ -8,7 +8,7 @@ public partial class OpenApiDocumentBuilder
 {
     private readonly OpenApiDocumentOptions _options;
     private OpenApiDocument _document = new();
-    private OpenApiSchemaBuilder _schemaBuilder = null!;
+    private IOpenApiSchemaBuilder _schemaBuilder = null!;
 
     public OpenApiDocumentBuilder(OpenApiDocumentOptions options)
     {
@@ -63,7 +63,7 @@ public partial class OpenApiDocumentBuilder
             },
             Paths = []
         };
-        _schemaBuilder = new OpenApiSchemaBuilder(_document);
+        _schemaBuilder = OpenApiSchemaBuilderFactory.Create(_document, _options.SpecVersion);
     }
 
     private string BuildServerUrl(string baseUrl)

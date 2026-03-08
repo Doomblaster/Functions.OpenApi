@@ -13,7 +13,7 @@ public partial class OpenApiDocumentBuilder
         {
             _ = _schemaBuilder.BuildComponentSchema(parameter.ParameterType);
 
-            var friendlyName = OpenApiSchemaBuilder.GetFriendlyFullName(parameter.ParameterType);
+            var friendlyName = OpenApiSchemaBuilderBase.GetFriendlyFullName(parameter.ParameterType);
             var parameterName = parameter.Name
                 ?? throw new InvalidOperationException("Route parameter name cannot be null.");
             var componentParameterName = $"{friendlyName}_{parameterName}";
@@ -44,7 +44,7 @@ public partial class OpenApiDocumentBuilder
                 throw new InvalidOperationException("Header name cannot be null or empty.");
 
             _ = _schemaBuilder.BuildComponentSchema(headerAttribute.HeaderType);
-            var friendlyName = OpenApiSchemaBuilder.GetFriendlyFullName(headerAttribute.HeaderType);
+            var friendlyName = OpenApiSchemaBuilderBase.GetFriendlyFullName(headerAttribute.HeaderType);
             var parameterName = $"{friendlyName}_{headerAttribute.Name}_header";
             var reference = new OpenApiSchemaReference(friendlyName, _document);
             var parameterReference = new OpenApiParameterReference(parameterName, _document);

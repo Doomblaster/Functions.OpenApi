@@ -1,5 +1,5 @@
 using Function.OpenApi;
-using FunctionApp1;
+using Function.OpenApi.Sample;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +17,7 @@ builder.Services
         options.Title = "Function OpenAPI Sample";
         options.Version = "1.0.0";
         options.ServerUrls.Add("http://localhost:7014");
-        options.Assemblies.Add(typeof(Function1).Assembly);
+        options.Assemblies.Add(typeof(SampleFunctions).Assembly);
     });
 
 builder.Build().Run();

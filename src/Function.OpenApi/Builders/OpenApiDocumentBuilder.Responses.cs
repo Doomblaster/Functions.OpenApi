@@ -25,7 +25,7 @@ public partial class OpenApiDocumentBuilder
 
             var mediaType = new OpenApiMediaType
             {
-                Schema = new OpenApiSchemaReference(OpenApiSchemaBuilder.GetFriendlyFullName(responseAttribute.BodyType), _document)
+                Schema = new OpenApiSchemaReference(OpenApiSchemaBuilderBase.GetFriendlyFullName(responseAttribute.BodyType), _document)
             };
             var response = new OpenApiResponse
             {
@@ -42,7 +42,7 @@ public partial class OpenApiDocumentBuilder
                         throw new InvalidOperationException("Header name cannot be null or empty.");
 
                     _ = _schemaBuilder.BuildComponentSchema(headerAttribute.HeaderType);
-                    var friendlyName = OpenApiSchemaBuilder.GetFriendlyFullName(headerAttribute.HeaderType);
+                    var friendlyName = OpenApiSchemaBuilderBase.GetFriendlyFullName(headerAttribute.HeaderType);
                     var schemaReference = new OpenApiSchemaReference(friendlyName, _document);
                     responseHeadersMap[headerAttribute.Name] = new OpenApiHeader
                     {
@@ -70,7 +70,7 @@ public partial class OpenApiDocumentBuilder
 
         _ = _schemaBuilder.BuildComponentSchema(requestBodyAttribute.BodyType);
 
-        var requestBodyName = OpenApiSchemaBuilder.GetFriendlyFullName(requestBodyAttribute.BodyType);
+        var requestBodyName = OpenApiSchemaBuilderBase.GetFriendlyFullName(requestBodyAttribute.BodyType);
         var mediaType = new OpenApiMediaType
         {
             Schema = new OpenApiSchemaReference(requestBodyName, _document)

@@ -14,6 +14,8 @@ public static class ConfigurationExtensions
         configure?.Invoke(options);
         services.AddSingleton(options);
         services.AddSingleton<OpenApiDocumentBuilder>();
+        services.AddSingleton<OpenApiJsonEndpoint>();
+        services.AddSingleton<OpenApiUIEndpoint>();
         return services;
     }
 }

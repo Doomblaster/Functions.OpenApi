@@ -6,11 +6,11 @@ using Microsoft.Testing.Platform.Logging;
 using Function.OpenApi;
 using Function.OpenApi.Tests;
 
-public class Function1
+public class TestFunctions
 {
-    private readonly ILogger<Function1> _logger;
+    private readonly ILogger<TestFunctions> _logger;
 
-    public Function1(ILogger<Function1> logger)
+    public TestFunctions(ILogger<TestFunctions> logger)
     {
         _logger = logger;
     }

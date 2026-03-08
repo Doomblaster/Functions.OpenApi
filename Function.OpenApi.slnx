@@ -1,5 +1,5 @@
 <Solution>
   <Project Path="src/Function.OpenApi/Function.OpenApi.csproj" />
   <Project Path="tests/Function.OpenApi.Tests/Function.OpenApi.Tests.csproj" />
-  <Project Path="samples/FunctionApp1/FunctionApp1.csproj" Id="b34fc3c8-5658-4a8b-9789-681fd8497367" />
+  <Project Path="samples/Function.OpenApi.Sample/Function.OpenApi.Sample.csproj" Id="b34fc3c8-5658-4a8b-9789-681fd8497367" />
 </Solution>

@@ -1,19 +1,15 @@
-﻿using Microsoft.OpenApi;
-using System.Linq;
-using System.Text.Json;
+using Microsoft.OpenApi;
 using System.Text.Json.Nodes;
-using System.Linq;
-using System.Threading.Tasks;
 using Function.OpenApi.Builders;
 
 namespace Function.OpenApi.Tests;
 
-public class UnitTest1
+public class OpenApiDocumentBuilderTests
 {
     [Fact]
-    public async Task Test1()
+    public async Task FullDocument_SerializesExpectedJson()
     {
-        var document = new OpenApiDocumentBuilder(typeof(Function1).Assembly).BuildDocument();
+        var document = new OpenApiDocumentBuilder(typeof(TestFunctions).Assembly).BuildDocument();
 
         var json = await document.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_0, TestContext.Current.CancellationToken);
         var today = DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd");
@@ -32,7 +28,7 @@ public class UnitTest1
               "paths": {
                 "/Function1": {
                   "get": {
-                    "operationId": "Function1GetFunction1",
+                    "operationId": "TestFunctionsGetFunction1",
                     "responses": {
                       "200": {
                         "description": "",
@@ -47,7 +43,7 @@ public class UnitTest1
                     }
                   },
                   "post": {
-                    "operationId": "Function1PostFunction1",
+                    "operationId": "TestFunctionsPostFunction1",
                     "responses": {
                       "200": {
                         "description": "",
@@ -64,7 +60,7 @@ public class UnitTest1
                 },
                 "/function2/{id}": {
                   "post": {
-                    "operationId": "Function1PostFunction2",
+                    "operationId": "TestFunctionsPostFunction2",
                     "parameters": [
                       {
                         "$ref": "#/components/parameters/System.Guid_id"
@@ -321,14 +317,67 @@ public class UnitTest1
         
     }
 
-    private static void RemoveDateOnlyExample(JsonNode? node)
+    [Fact]
+    public async Task DefaultBehavior_GeneratesOpenApi304()
     {
-        if (node is null)
-        {
-            return;
-        }
+        var document = new OpenApiDocumentBuilder(typeof(TestFunctions).Assembly).BuildDocument();
 
-        var schema = node["components"]?["schemas"]?["System.DateOnly"] as JsonObject;
-        schema?.Remove("example");
+        var json = await document.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_0, TestContext.Current.CancellationToken);
+        var node = JsonNode.Parse(json);
+
+        Assert.Equal("3.0.4", node!["openapi"]?.GetValue<string>());
+    }
+
+    [Fact]
+    public async Task ExplicitOpenApi30_GeneratesOpenApi304()
+    {
+        var options = new OpenApiDocumentOptions
+        {
+            Title = "Test OpenApi Implementation",
+            Version = "1.0.0",
+            ServerUrls = ["http://localhost:7136"],
+            Assemblies = [typeof(TestFunctions).Assembly],
+            SpecVersion = OpenApiSpecVersion.OpenApi3_0
+        };
+        var document = new OpenApiDocumentBuilder(options).BuildDocument();
+
+        var json = await document.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_0, TestContext.Current.CancellationToken);
+        var node = JsonNode.Parse(json);
+
+        Assert.Equal("3.0.4", node!["openapi"]?.GetValue<string>());
+    }
+
+    [Fact]
+    public async Task ExplicitOpenApi30_MatchesDefaultOutput()
+    {
+        var defaultDocument = new OpenApiDocumentBuilder(typeof(TestFunctions).Assembly).BuildDocument();
+        var defaultJson = await defaultDocument.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_0, TestContext.Current.CancellationToken);
+
+        var explicitOptions = new OpenApiDocumentOptions
+        {
+            Title = "Test OpenApi Implementation",
+            Version = "1.0.0",
+            ServerUrls = ["http://localhost:7136"],
+            Assemblies = [typeof(TestFunctions).Assembly],
+            SpecVersion = OpenApiSpecVersion.OpenApi3_0
+        };
+        var explicitDocument = new OpenApiDocumentBuilder(explicitOptions).BuildDocument();
+        var explicitJson = await explicitDocument.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_0, TestContext.Current.CancellationToken);
+
+        Assert.Equal(defaultJson, explicitJson);
+    }
+
+    [Fact]
+    public async Task DefaultBehavior_HasNullableKeyword_In30()
+    {
+        var document = new OpenApiDocumentBuilder(typeof(TestFunctions).Assembly).BuildDocument();
+
+        var json = await document.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_0, TestContext.Current.CancellationToken);
+        var node = JsonNode.Parse(json);
+
+        // In OpenAPI 3.0, nullable types use "nullable": true
+        var nullableGuidSchema = node!["components"]?["schemas"]?["System.Nullable_System.Guid"];
+        Assert.NotNull(nullableGuidSchema);
+        Assert.True(nullableGuidSchema!["nullable"]?.GetValue<bool>());
     }
 }
