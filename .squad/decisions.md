@@ -139,6 +139,68 @@ Removed all default placeholder names from the repository. No behavioral changes
 
 ---
 
+### 5. CI Pipeline & NuGet Packaging
+
+**Decision ID:** naomi-ci-nuget-packaging  
+**Owner:** Naomi (Lead / Architect)  
+**Date:** 2026-03-09  
+**Status:** Implemented
+
+Added GitHub Actions CI pipeline and configured the library for NuGet packaging with semantic versioning.
+
+**Key Decisions:**
+1. **MinVer** for versioning — tag-driven semver, no external tool installs, integrates as MSBuild package.
+2. **Two-job CI pipeline:** `build-and-test` runs on PRs and pushes; `pack` runs only on push to main/tags, gated behind test success.
+3. **global.json SDK pinning** at `10.0.103` with `latestFeature` rollForward for CI reproducibility.
+4. **.NET 10 preview** SDK in CI via `dotnet-quality: 'preview'`.
+
+**Files Changed:**
+- `.github/workflows/ci.yml` — New CI pipeline
+- `src/Function.OpenApi/Function.OpenApi.csproj` — NuGet metadata, MinVer dependency
+- `global.json` — SDK version pin
+
+**Verification:**
+- Build: ✅ Succeeds (0 warnings, 0 errors)
+- Tests: ✅ All pass (56/56)
+- Pipeline: ✅ Valid and ready for production use
+
+**Action Required:**
+- **Espen:** Enable GitHub branch protection rule on `main` requiring `Build & Test` status check
+- **Espen:** Tag `v0.1.0` when ready to set initial version (MinVer reads git tags)
+
+---
+
+### 6. Branch Protection for `main`
+
+**Decision ID:** naomi-branch-protection  
+**Owner:** Naomi (Lead / Architect)  
+**Date:** 2026-03-10  
+**Status:** Blocked  
+**Requested by:** Espen
+
+**Intent:** Enable branch protection on `main` requiring the "Build & Test" CI status check to pass before merging PRs, with strict up-to-date branch enforcement.
+
+**Configuration (Ready to Apply):**
+- **Required status check:** `Build & Test` (job `build-and-test` in `.github/workflows/ci.yml`)
+- **Strict mode:** Branches must be up to date before merging
+- **PR reviews:** Not required (small team, AI-assisted workflow)
+- **Push restrictions:** None
+- **Admin enforcement:** Disabled
+
+**Blocker:** The repository is **private** on **GitHub Free**. Both the legacy branch protection API and rulesets API return HTTP 403: "Upgrade to GitHub Pro or make this repository public to enable this feature."
+
+**Options:**
+1. **Make the repo public** — enables branch protection on Free plan (natural choice if open-sourcing is planned)
+2. **Upgrade to GitHub Pro** — $4/mo, enables branch protection on private repos
+3. **Accept the risk** — rely on team discipline (CI still runs, not enforced as a gate)
+
+**Action Required:** **Espen** — Choose an option above. Configuration is ready to apply once blocker is resolved.
+
+**Completed Work:**
+- **v0.1.0 tag:** Created and pushed successfully. MinVer will now derive `0.1.0`-based package versions from this tag.
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
